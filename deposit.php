@@ -1,6 +1,6 @@
 <?php
 include('dbConnect.php');
-$message = "";
+$message = "  ";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $member_id = $_POST['member_id'];
