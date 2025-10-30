@@ -24,7 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 throw new Exception("Error recording deposit: " . mysqli_error($conn));
             }
 
-            // U
+            
             $sql2 = "UPDATE Account SET Balance = Balance + '$amount' WHERE MemberID = '$member_id'";
             if (!mysqli_query($conn, $sql2)) {
                 throw new Exception("Error updating account balance: " . mysqli_error($conn));

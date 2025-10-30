@@ -23,7 +23,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
 
             $sql1 = "INSERT INTO Savings (memberId, amount, transactionType, transactionDate)
-                     VALUES ('$member_id', '$amount', 'Withdrawal', NOW())";
+                     VALUES ('$member_id', '$amount', 'Withdraw', NOW())";
             if (!mysqli_query($conn, $sql1)) {
                 throw new Exception("Error recording withdrawal: " . mysqli_error($conn));
             }
