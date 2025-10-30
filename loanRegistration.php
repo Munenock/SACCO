@@ -10,11 +10,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if (!empty($memberId) && !empty($loanAmount) && !empty($interestRate) && !empty($dueDate)) {
 
-        $hasLoan = mysqli_query($conn, "SELECT * FROM Loan WHERE memberId = '$memberId'");
-        if (mysqli_num_rows($hasLoan) > 0) {
+     $hasActiveLoan = mysqli_query($conn, "
+                SELECT l.loanId, l.loanAmount, 
+                       COALESCE(SUM(lr.amountPaid), 0) as totalPaid,
+                       (l.loanAmount - COALESCE(SUM(lr.amountPaid), 0)) as remainingBalance
+                FROM Loan l 
+                LEFT JOIN LoanRepayment lr ON l.loanId = lr.loanId 
+                WHERE l.memberId = '$memberId' 
+                GROUP BY l.loanId, l.loanAmount
+                HAVING remainingBalance > 0
+            ");
+        if (mysqli_num_rows($hasActiveLoan)>0 ) {
             $message = " Member already has a loan. ";
         } else {
-            $totalLoan = $loanAmount + ($loanAmount * ($interestRate));
+            $totalLoan = $loanAmount + ($loanAmount * ($interestRate / 100));
 
             $statement = "INSERT INTO Loan (memberId, loanAmount, interestRate, loanDate, dueDate)
                     VALUES ('$memberId', '$totalLoan', '$interestRate', NOW(), '$dueDate')";
@@ -108,11 +117,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             <label>Loan Amount:</label>
             <input type="number" name="loan_amount" min="20000" step="1000"
-                placeholder="Minimum: 20,000" required
-                >
+                placeholder="Minimum: 20,000" required>
 
             <label>Interest Rate:</label>
-            <input type="number" name="interest_rate" step="0.1" required>
+            <input type="number" name="interest_rate" required>
 
             <label>Due Date:</label>
             <input type="date" name="due_date" required>
